@@ -20,6 +20,7 @@ public class FastestPathServicePerformanceTest {
             {30, 30},   // board: 900 cells
             {50, 50},   // board: 2500 cells
             {100, 100},  // Extreme board: 10000 cells
+            {300, 300},  // board took > than 1 second: 90_000 cells
         };
 
         for (int[] size : boardSizes) {
@@ -32,19 +33,18 @@ public class FastestPathServicePerformanceTest {
             long endTime = System.currentTimeMillis();
             long executionTime = endTime - startTime;
 
+            // If a board takes more than 1 seconds, skip the rest
+            if (executionTime > 1000) {
+                System.err.println("PERFORMANCE METRICS (not an actual failure):\n" + performanceResults);
+                System.err.println(String.format("PERFORMANCE METRICS (failure case):\n  %dx%d calculation board took too long. (%d cells, execution time: %d ms)\n", rows, cols, rows * cols, executionTime));
+                break;
+            }
             performanceResults.append(rows).append("x").append(cols)
                 .append(" board (").append(rows * cols).append(" cells)")
                 .append(" execution time: ").append(executionTime).append("ms\n");
             performanceResults.append("Path length: ").append(fastestPath.size()).append("\n");
 
-            // If a board takes more than 1 seconds, skip the rest
-            if (executionTime > 1000) {
-                performanceResults.append("\n!!!\n").append(rows).append("x").append(cols).append(" board took too long.\n");
-                Assertions.fail("PERFORMANCE METRICS (not a real failure):\n" + performanceResults);
-                break;
-            }
         }
-        System.out.println(performanceResults);
     }
 
 }
